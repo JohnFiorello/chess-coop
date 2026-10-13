@@ -223,7 +223,14 @@
       const lm=legalTargets.find(m=>m.r===r&&m.c===c);if(lm)sq.classList.add(lm.capture?"capture":"legal");
       if(p?.type==="K"&&inCheck(p.owner))sq.classList.add("in-check");
       if(p){
-        const sp=document.createElement("span");sp.className="piece "+(p.owner==="CPU"?"cpu":"");sp.textContent=GLYPH[p.type];sp.style.color=p.owner==="CPU"?"#0c1018":COLORS[p.owner];sp.title=p.owner+" "+p.type;sq.appendChild(sp);
+        if(p.owner===current&&!gameOver)sq.classList.add("current-piece");
+        const sp=document.createElement("span");
+        sp.className="piece "+(p.owner==="CPU"?"cpu":"");
+        sp.textContent=p.type;
+        sp.style.setProperty("--piece-color",p.owner==="CPU"?"#343b49":COLORS[p.owner]);
+        sp.title=p.owner+" "+p.type;
+        sq.setAttribute("aria-label",p.owner+" "+p.type+" at "+FILES[c]+(r+1));
+        sq.appendChild(sp);
       }
       sq.addEventListener("click",()=>clickSquare(r,c));board.appendChild(sq);
     }
