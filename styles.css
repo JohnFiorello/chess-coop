@@ -47,3 +47,5 @@ h1{margin:4px 0 5px;font-size:clamp(28px,4vw,48px);line-height:1}
   .status-card{gap:10px;align-items:flex-start;flex-wrap:wrap}.status-card .grow{flex-basis:100%}
   .board-wrap{max-height:68vh}.board{--cell:36px}
 }
+.howto{margin:0 0 10px;padding:10px 12px;border:1px solid #3b4b72;border-radius:12px;background:#151e34;color:#f6f7fb;font-size:13px;line-height:1.45}
+.howto span{color:#a8b0c4}
