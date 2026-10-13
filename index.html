@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Six-player cooperative chess rules prototype">
+  <title>Cooperative Chess — 6P Rules Prototype</title>
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">RULES PROTOTYPE • SIX-PLAYER STRESS TEST</div>
+        <h1>COOPERATIVE CHESS</h1>
+        <p>Six human armies. One central CPU fortress. Four-square engagement distance on every side.</p>
+      </div>
+      <div class="toolbar">
+        <button id="resetBtn">Reset board</button>
+        <button id="cpuBtn">Force CPU move</button>
+      </div>
+    </header>
+
+    <section class="status-card">
+      <div><span class="label">TURN</span><strong id="turnLabel">P1</strong></div>
+      <div><span class="label">CPU PIECES</span><strong id="cpuCount">—</strong></div>
+      <div><span class="label">CURRENT KING</span><strong id="checkLabel">Safe</strong></div>
+      <div class="grow"><span class="label">STATUS</span><strong id="message">Select a P1 piece.</strong></div>
+    </section>
+
+    <section class="legend" id="legend"></section>
+
+    <section class="board-wrap">
+      <div class="rank-labels" id="rankLabels"></div>
+      <div class="board-shell">
+        <div class="file-labels" id="fileLabels"></div>
+        <div id="board" class="board" aria-label="17 by 22 cooperative chess board"></div>
+      </div>
+    </section>
+
+    <section class="notes">
+      <h2>Prototype assumptions</h2>
+      <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. CPU moves automatically after every human move.</p>
+    </section>
+  </main>
+  <script src="app.js?v=1"></script>
+</body>
+</html>
