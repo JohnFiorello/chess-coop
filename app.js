@@ -204,7 +204,7 @@
     }
     if(q&&q.owner===owner){
       selected=q;legalTargets=legalMoves(q);
-      message=(inCheck(owner)?owner+" is in CHECK — this move must resolve it.":owner+" selected "+q.type+".");
+      message=(inCheck(owner)?owner+" is in CHECK — this move must resolve it.":owner+" selected "+q.type+" — now tap a green square.");
     }else{
       selected=null;legalTargets=[];message="It is "+owner+"'s turn.";
     }
