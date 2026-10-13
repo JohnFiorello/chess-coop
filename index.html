@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111827">
   <meta name="description" content="Six-player cooperative chess rules prototype">
   <title>Cooperative Chess — 6P Rules Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <main class="app">
@@ -29,7 +29,9 @@
       <div class="grow"><span class="label">STATUS</span><strong id="message">Select a P1 piece.</strong></div>
     </section>
 
-    <section class="howto"><strong>How to move:</strong> Tap one of the pieces belonging to the player whose turn it is, then tap one of the highlighted destination squares. <span>Green = legal move • Red ring = capture.</span></section>\n\n    <section class="legend" id="legend"></section>
+    <section class="howto"><strong>How to move:</strong> Tap one of the pieces belonging to the player whose turn it is, then tap one of the highlighted destination squares. <span>Green = legal move • Red ring = capture.</span></section>
+
+    <section class="legend" id="legend"></section>
 
     <section class="board-wrap">
       <div class="rank-labels" id="rankLabels"></div>
@@ -44,6 +46,6 @@
       <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. CPU moves automatically after every human move.</p>
     </section>
   </main>
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
