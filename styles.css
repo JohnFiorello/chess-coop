@@ -272,3 +272,61 @@ h1{margin:4px 0 5px;font-size:clamp(28px,4vw,48px);line-height:1}
   font-size:calc(var(--cell)*.22)!important;
   color:rgba(255,255,255,.82)!important;
 }
+
+
+/* v12 online multiplayer polish */
+.hidden{display:none!important}
+.lobby-overlay{
+  position:fixed;inset:0;z-index:1000;display:grid;place-items:center;
+  padding:18px;background:rgba(5,9,18,.94);backdrop-filter:blur(10px);
+}
+.lobby-card{
+  width:min(560px,100%);padding:24px;border:1px solid #364263;border-radius:20px;
+  background:linear-gradient(180deg,#151d31,#0d1424);box-shadow:0 24px 70px rgba(0,0,0,.45)
+}
+.lobby-card h1{font-size:clamp(30px,7vw,52px);margin:4px 0 8px}
+.lobby-sub{color:#a8b0c4;line-height:1.5;margin:0 0 18px}
+.name-field{display:grid;gap:6px;font-size:12px;font-weight:800;color:#b9c3d9;margin-bottom:14px}
+.name-field input,.join-row input{
+  width:100%;border:1px solid #455273;border-radius:11px;background:#0a1020;color:#fff;
+  padding:12px 13px;font:inherit;font-size:16px;outline:none
+}
+.name-field input:focus,.join-row input:focus{border-color:#7d8ec0;box-shadow:0 0 0 3px rgba(125,142,192,.18)}
+.lobby-home{display:grid;gap:10px}
+.join-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.primary{background:#2b6fe8;border-color:#4a86ee}
+.primary:hover{background:#3479f0}
+.quiet{background:#11182a;color:#b8c1d5}
+.room-panel{display:grid;gap:12px}
+.room-code-box{
+  display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;
+  padding:12px;border:1px solid #3e4c6c;border-radius:14px;background:#0a1020
+}
+.room-code-box span{font-size:10px;font-weight:900;letter-spacing:.14em;color:#8593b4}
+.room-code-box strong{font-size:28px;letter-spacing:.16em}
+.small{padding:7px 10px}
+.connection-message{font-size:13px;color:#a8b0c4}
+.participants{display:grid;gap:7px}
+.participant{
+  display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;
+  padding:9px 10px;border-radius:10px;background:#11182a;border:1px solid #28344f
+}
+.participant .avatar{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#253252;font-size:12px;font-weight:900}
+.participant>span:last-child{font-size:11px;color:#8390ad}
+.network-badge{
+  display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;
+  font-size:10px;font-weight:900;letter-spacing:.08em;background:#1a2238;color:#aab5cf;border:1px solid #33405e
+}
+.network-badge.online{background:#0f2a22;color:#7fe3b6;border-color:#28624e}
+.legend-chip{gap:7px}
+.legend-chip small{font-size:9px;font-weight:700;color:#9aa6c1}
+.turn-hint{font-weight:900;letter-spacing:.05em}
+@media(max-width:760px){
+  .lobby-overlay{padding:10px;align-items:start;overflow:auto}
+  .lobby-card{margin-top:10px;padding:18px}
+  .room-code-box{grid-template-columns:1fr auto}
+  .room-code-box span{grid-column:1/-1}
+  .topbar{margin-bottom:8px}
+  .toolbar{align-items:center}
+  .legend-chip small{display:none}
+}
