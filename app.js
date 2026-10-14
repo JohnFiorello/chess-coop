@@ -6,7 +6,7 @@
   const GLYPH={K:"♚",Q:"♛",R:"♜",B:"♝",N:"♞",P:"♟"};
   const back=["R","N","B","Q","K","B","N","R"];
 
-  let pieces=[], selected=null, legalTargets=[], currentHuman=0, gameOver=false, message="", turnTransferred=false;
+  let pieces=[], selected=null, legalTargets=[], currentHuman=0, gameOver=false, message="", turnTransferred=false, lastCpuMove=null;
 
   function piece(owner,type,r,c,dr=0,dc=0){return {id:owner+"-"+type+"-"+r+"-"+c+"-"+Math.random().toString(36).slice(2,7),owner,type,r,c,dr,dc,moved:false,alive:true};}
   function at(r,c,arr=pieces){return arr.find(p=>p.alive&&p.r===r&&p.c===c)||null;}
@@ -48,7 +48,7 @@
   }
 
   function reset(){
-    pieces=[];selected=null;legalTargets=[];currentHuman=0;gameOver=false;turnTransferred=false;
+    pieces=[];selected=null;legalTargets=[];currentHuman=0;gameOver=false;turnTransferred=false;lastCpuMove=null;
     addArmy("P1","top",1);
     addArmy("P2","right",0);
     addArmy("P3","bottom",1);
@@ -202,7 +202,9 @@
     }
     if(!candidates.length){message="CPU has no legal move.";finishChecks();render();return;}
     candidates.sort((a,b)=>b.score-a.score);
-    applyMove(candidates[0].p,candidates[0].m);
+    const chosen=candidates[0];
+    lastCpuMove={from:{r:chosen.p.r,c:chosen.p.c},to:{r:chosen.m.r,c:chosen.m.c}};
+    applyMove(chosen.p,chosen.m);
     finishChecks();
     if(!gameOver)advanceHuman();
     render();
@@ -238,7 +240,7 @@
     const owner=HUMAN_IDS[currentHuman],q=at(r,c);
     const target=legalTargets.find(m=>m.r===r&&m.c===c);
     if(selected&&target){
-      if(applyMove(selected,target)){turnTransferred=false;finishChecks();render();if(!gameOver)setTimeout(cpuMove,350);}
+      if(applyMove(selected,target)){lastCpuMove=null;turnTransferred=false;finishChecks();render();if(!gameOver)setTimeout(cpuMove,350);}
       return;
     }
     if(q&&q.owner===owner){
@@ -259,6 +261,8 @@
       const p=at(r,c);
       if(r>=3&&r<=12&&c>=3&&c<=6)sq.classList.add("cpu-zone");
       if(selected?.r===r&&selected?.c===c)sq.classList.add("selected");
+      if(lastCpuMove?.from.r===r&&lastCpuMove?.from.c===c)sq.classList.add("cpu-from");
+      if(lastCpuMove?.to.r===r&&lastCpuMove?.to.c===c)sq.classList.add("cpu-to");
       const lm=legalTargets.find(m=>m.r===r&&m.c===c);if(lm)sq.classList.add(lm.capture?"capture":"legal");
       if(p?.type==="K"&&inCheck(p.owner))sq.classList.add("in-check");
       if(p){
@@ -285,6 +289,20 @@
     banner.style.setProperty("--turn-color",COLORS[current]);
     document.getElementById("turnDot").style.background=COLORS[current];
     document.getElementById("turnBannerText").textContent=gameOver?"GAME OVER":current+" TURN";
+
+    const arrow=document.getElementById("cpuMoveArrow");
+    const line=document.getElementById("cpuArrowLine");
+    if(arrow&&line){
+      if(lastCpuMove){
+        line.setAttribute("x1",lastCpuMove.from.c+0.5);
+        line.setAttribute("y1",lastCpuMove.from.r+0.5);
+        line.setAttribute("x2",lastCpuMove.to.c+0.5);
+        line.setAttribute("y2",lastCpuMove.to.r+0.5);
+        line.style.opacity="1";
+      }else{
+        line.style.opacity="0";
+      }
+    }
 
     const pass=document.getElementById("passTargets");
     if(pass){
