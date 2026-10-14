@@ -1,8 +1,8 @@
 (() => {
   "use strict";
-  const COLS=16, ROWS=16, FILES="ABCDEFGHIJKLMNOP";
-  const HUMAN_IDS=["P1","P2","P3","P4","P5","P6"];
-  const COLORS={P1:"#ef476f",P2:"#f78c3d",P3:"#ffd166",P4:"#06d6a0",P5:"#36a2eb",P6:"#9b5de5",CPU:"#8c96a8"};
+  const COLS=10, ROWS=16, FILES="ABCDEFGHIJ";
+  const HUMAN_IDS=["P1","P2","P3","P4"];
+  const COLORS={P1:"#7fbf7f",P2:"#ff9f1c",P3:"#ffd166",P4:"#8f79d8",CPU:"#d33a2c"};
   const GLYPH={K:"♚",Q:"♛",R:"♜",B:"♝",N:"♞",P:"♟"};
   const back=["R","N","B","Q","K","B","N","R"];
 
@@ -26,36 +26,33 @@
       back.forEach((t,i)=>pieces.push(piece(owner,t,4+i,0,0,1)));
       for(let i=0;i<8;i++)pieces.push(piece(owner,"P",4+i,1,0,1));
     }else if(edge==="right"){
-      back.forEach((t,i)=>pieces.push(piece(owner,t,4+i,15,0,-1)));
-      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",4+i,14,0,-1));
+      back.forEach((t,i)=>pieces.push(piece(owner,t,4+i,9,0,-1)));
+      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",4+i,8,0,-1));
     }
   }
 
+
   function setupCPU(){
-    // Exact compact six-player sketch:
-    // top/bottom: CPU pawn wall, one empty rank, then human pawns.
-    for(let c=6;c<=9;c++) pieces.push(piece("CPU","P",3,c,-1,0));
-    for(let c=6;c<=9;c++) pieces.push(piece("CPU","P",12,c,1,0));
+    // Compact four-player fortress: pawn shell + two-file core, one king total.
+    for(let c=3;c<=6;c++) pieces.push(piece("CPU","P",3,c,-1,0));
+    for(let c=3;c<=6;c++) pieces.push(piece("CPU","P",12,c,1,0));
+    for(let r=4;r<=11;r++) pieces.push(piece("CPU","P",r,3,0,-1));
+    for(let r=4;r<=11;r++) pieces.push(piece("CPU","P",r,6,0,1));
 
-    // Side-facing pawn walls. The larger six-player board keeps the side approach lanes.
-    for(let r=4;r<=11;r++) pieces.push(piece("CPU","P",r,6,0,-1));
-    for(let r=4;r<=11;r++) pieces.push(piece("CPU","P",r,9,0,1));
-
-    // Two-file CPU back ranks, one king total.
     const leftCore=["R","N","B","Q","K","B","N","R"];
     const rightCore=["R","N","B","Q",null,"B","N","R"];
     for(let i=0;i<8;i++){
-      if(leftCore[i]) pieces.push(piece("CPU",leftCore[i],4+i,7));
-      if(rightCore[i]) pieces.push(piece("CPU",rightCore[i],4+i,8));
+      if(leftCore[i]) pieces.push(piece("CPU",leftCore[i],4+i,4));
+      if(rightCore[i]) pieces.push(piece("CPU",rightCore[i],4+i,5));
     }
   }
 
   function reset(){
     pieces=[];selected=null;legalTargets=[];currentHuman=0;gameOver=false;turnTransferred=false;
-    addArmy("P1","top",0);addArmy("P2","top",8);
-    addArmy("P3","right",0);
-    addArmy("P4","bottom",8);addArmy("P5","bottom",0);
-    addArmy("P6","left",0);
+    addArmy("P1","top",1);
+    addArmy("P2","right",0);
+    addArmy("P3","bottom",1);
+    addArmy("P4","left",0);
     setupCPU();
     message="Select a P1 piece.";
     render();
@@ -260,7 +257,7 @@
       const sq=document.createElement("button");sq.className="square";
       sq.style.setProperty("--sq",(r+c)%2?"var(--dark)":"var(--light)");
       const p=at(r,c);
-      if(r>=3&&r<=12&&c>=6&&c<=9)sq.classList.add("cpu-zone");
+      if(r>=3&&r<=12&&c>=3&&c<=6)sq.classList.add("cpu-zone");
       if(selected?.r===r&&selected?.c===c)sq.classList.add("selected");
       const lm=legalTargets.find(m=>m.r===r&&m.c===c);if(lm)sq.classList.add(lm.capture?"capture":"legal");
       if(p?.type==="K"&&inCheck(p.owner))sq.classList.add("in-check");
