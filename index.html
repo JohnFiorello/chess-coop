@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111827">
   <meta name="description" content="Six-player cooperative chess rules prototype">
   <title>Cooperative Chess — 6P Rules Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
   <main class="app">
@@ -33,7 +33,20 @@
 
     <section class="legend" id="legend"></section>
 
-    <section class="board-wrap">
+    <section class="turn-banner" id="turnBanner">
+      <span class="turn-dot" id="turnDot"></span>
+      <strong id="turnBannerText">P1 TURN</strong>
+      <span class="turn-hint">Move one piece, then CPU responds.</span>
+    </section>
+
+    <section class="board-tools">
+      <button id="zoomOutBtn" aria-label="Zoom board out">−</button>
+      <button id="fitBtn">Fit board</button>
+      <button id="zoomInBtn" aria-label="Zoom board in">+</button>
+      <span>Pinch-zoom is unreliable inside large boards on iPhone, so use these controls.</span>
+    </section>
+
+    <section class="board-wrap" id="boardWrap">
       <div class="rank-labels" id="rankLabels"></div>
       <div class="board-shell">
         <div class="file-labels" id="fileLabels"></div>
@@ -43,9 +56,9 @@
 
     <section class="notes">
       <h2>Prototype assumptions</h2>
-      <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. CPU moves automatically after every human move.</p>
+      <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. Pawns may move two squares on their first move and promote to queens at the far edge. Experimental endgame rule: when the CPU is down to its king plus one piece, it moves only once per full surviving-human round to prevent a king-and-queen chase from becoming effectively endless.</p>
     </section>
   </main>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
