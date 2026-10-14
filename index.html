@@ -4,21 +4,53 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111827">
-  <meta name="description" content="Four-player cooperative chess rules prototype">
-  <title>Cooperative Chess — 4P Rules Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=11">
+  <meta name="description" content="Four-player cooperative chess versus a central CPU fortress">
+  <title>Cooperative Chess — Online Test</title>
+  <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
+  <div id="lobbyOverlay" class="lobby-overlay">
+    <section class="lobby-card">
+      <div class="eyebrow">ONLINE PLAYTEST</div>
+      <h1>COOPERATIVE CHESS</h1>
+      <p class="lobby-sub">Up to four people cooperate against one central CPU army. With fewer than four people, teams are automatically shared between players.</p>
+
+      <label class="name-field">Your name
+        <input id="playerName" maxlength="20" autocomplete="name" placeholder="Player name">
+      </label>
+
+      <div id="lobbyHome" class="lobby-home">
+        <button id="hostGameBtn" class="primary">Host online game</button>
+        <div class="join-row">
+          <input id="roomCodeInput" maxlength="6" inputmode="text" autocomplete="off" placeholder="ROOM CODE">
+          <button id="joinGameBtn">Join game</button>
+        </div>
+        <button id="soloBtn" class="quiet">Play solo / local test</button>
+      </div>
+
+      <div id="roomPanel" class="room-panel hidden">
+        <div class="room-code-box">
+          <span>ROOM CODE</span>
+          <strong id="roomCodeDisplay">------</strong>
+          <button id="copyRoomBtn" class="small">Copy</button>
+        </div>
+        <div id="connectionMessage" class="connection-message">Connecting…</div>
+        <div id="participants" class="participants"></div>
+        <button id="startGameBtn" class="primary hidden">Start game</button>
+      </div>
+    </section>
+  </div>
+
   <main class="app">
     <header class="topbar">
       <div>
-        <div class="eyebrow">RULES PROTOTYPE • FOUR-PLAYER TEST</div>
+        <div class="eyebrow">FOUR-TEAM CO-OP TEST</div>
         <h1>COOPERATIVE CHESS</h1>
-        <p>Four human armies. One central CPU fortress. One-square engagement distance on every side.</p>
+        <p>Four chess armies surround a compact CPU fortress. Human teams can share turns to coordinate attacks.</p>
       </div>
       <div class="toolbar">
+        <span id="networkBadge" class="network-badge">LOCAL</span>
         <button id="resetBtn">Reset board</button>
-        <button id="cpuBtn">Force CPU move</button>
       </div>
     </header>
 
@@ -26,23 +58,21 @@
       <div><span class="label">TURN</span><strong id="turnLabel">P1</strong></div>
       <div><span class="label">CPU PIECES</span><strong id="cpuCount">—</strong></div>
       <div><span class="label">CURRENT KING</span><strong id="checkLabel">Safe</strong></div>
-      <div class="grow"><span class="label">STATUS</span><strong id="message">Select a P1 piece.</strong></div>
+      <div class="grow"><span class="label">STATUS</span><strong id="message">Waiting to start.</strong></div>
     </section>
-
-    <section class="howto"><strong>How to move:</strong> Tap one of the pieces belonging to the player whose turn it is, then tap one of the highlighted destination squares. <span>Green = legal move • Red ring = capture.</span></section>
 
     <section class="legend" id="legend"></section>
 
     <section class="turn-banner" id="turnBanner">
       <span class="turn-dot" id="turnDot"></span>
       <strong id="turnBannerText">P1 TURN</strong>
-      <span class="turn-hint">Move one piece, then CPU responds.</span>
+      <span class="turn-hint" id="turnHint">Move one piece, then CPU responds.</span>
     </section>
 
     <section class="assist-panel">
       <div>
-        <strong>Co-op assist:</strong>
-        <span>Give this human turn to another surviving teammate before moving.</span>
+        <strong>Co-op assist</strong>
+        <span>Before moving, the active team can give this turn to another surviving team.</span>
       </div>
       <div class="pass-targets" id="passTargets"></div>
     </section>
@@ -51,7 +81,7 @@
       <button id="zoomOutBtn" aria-label="Zoom board out">−</button>
       <button id="fitBtn">Fit board</button>
       <button id="zoomInBtn" aria-label="Zoom board in">+</button>
-      <span>Pinch-zoom is unreliable inside large boards on iPhone, so use these controls.</span>
+      <span id="seatSummary"></span>
     </section>
 
     <section class="board-wrap" id="boardWrap">
@@ -59,18 +89,16 @@
       <div class="board-shell">
         <div class="file-labels" id="fileLabels"></div>
         <div id="board" class="board" aria-label="10 by 16 cooperative chess board"></div>
-        <svg id="cpuMoveArrow" class="cpu-move-arrow" viewBox="0 0 10 16" preserveAspectRatio="none" aria-hidden="true">
-          <defs><marker id="cpuArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth=".75" markerHeight=".75" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs>
-          <line id="cpuArrowLine" x1="0" y1="0" x2="0" y2="0" marker-end="url(#cpuArrowHead)"></line>
-        </svg>
       </div>
     </section>
 
     <section class="notes">
-      <h2>Prototype assumptions</h2>
-      <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. Pawns may move two squares on their first move and promote to queens at the far edge. A player may give their turn to another surviving teammate before moving, unless their own king is in check; this lets the team react cooperatively to threats. Experimental endgame rule: when the CPU is down to its king plus one piece, it moves only once per full surviving-human round to prevent a king-and-queen chase from becoming effectively endless.</p>
+      <h2>Current playtest rules</h2>
+      <p>Human allies block one another but cannot capture one another. Pawns may move two squares on their first move and promote to queens at the far edge. If a human king is checkmated, that entire army is removed. The CPU king cannot be captured; if it is pinned early, the team must still destroy the remaining CPU army. When only the CPU king remains, checkmate wins.</p>
     </section>
   </main>
-  <script src="app.js?v=11"></script>
+
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>
