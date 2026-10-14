@@ -145,3 +145,34 @@ h1{margin:4px 0 5px;font-size:clamp(28px,4vw,48px);line-height:1}
   .board-wrap{max-height:72vh;padding-left:28px}
   .rank-labels{width:28px}
 }
+
+
+/* v5 compact board + co-op assist */
+.assist-panel{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin:0 0 8px;
+  padding:10px 12px;
+  border:1px solid #344263;
+  border-radius:12px;
+  background:#11182a;
+}
+.assist-panel strong{display:block;margin-bottom:2px}
+.assist-panel span{font-size:12px;color:#a8b0c4}
+.pass-targets{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pass-target{
+  --c:#888;
+  border-color:var(--c);
+  color:var(--c);
+  background:#0c1220;
+  padding:7px 10px;
+  min-width:52px;
+}
+.pass-target.check{box-shadow:0 0 0 2px rgba(255,48,79,.45);color:#fff}
+.pass-target:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:760px){
+  .assist-panel{align-items:flex-start;flex-direction:column}
+  .pass-targets{justify-content:flex-start}
+}
