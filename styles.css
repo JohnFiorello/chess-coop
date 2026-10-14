@@ -262,3 +262,13 @@ h1{margin:4px 0 5px;font-size:clamp(28px,4vw,48px);line-height:1}
   color:rgba(255,214,10,.72);
   text-shadow:0 1px 1px rgba(0,0,0,.55);
 }
+
+/* v11 CPU direction marker belongs on origin square */
+.cpu-trace-dot{display:none!important}
+.cpu-trace-arrow{
+  left:auto!important;
+  right:3px!important;
+  top:2px!important;
+  font-size:calc(var(--cell)*.22)!important;
+  color:rgba(255,255,255,.82)!important;
+}
