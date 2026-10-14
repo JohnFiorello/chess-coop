@@ -192,12 +192,12 @@ h1{margin:4px 0 5px;font-size:clamp(28px,4vw,48px);line-height:1}
 }
 .cpu-move-arrow line{
   stroke:#ff3b30;
-  stroke-width:.11;
+  stroke-width:.045;
   stroke-linecap:round;
   opacity:0;
-  filter:drop-shadow(0 0 .08px rgba(0,0,0,.9));
+  filter:none;
 }
-.cpu-move-arrow path{fill:#ff3b30}
+.cpu-move-arrow path{fill:rgba(255,59,48,.28)}
 .square.cpu-from{
   box-shadow:inset 0 0 0 5px rgba(255,59,48,.95)!important;
 }
@@ -207,3 +207,8 @@ h1{margin:4px 0 5px;font-size:clamp(28px,4vw,48px);line-height:1}
 .square.cpu-to .piece{
   box-shadow:0 0 0 3px rgba(255,214,10,.85),0 0 14px rgba(255,214,10,.8);
 }
+
+.cpu-move-arrow line{stroke-opacity:.16}
+.square.cpu-from{box-shadow:inset 0 0 0 2px rgba(255,59,48,.45)!important}
+.square.cpu-to{box-shadow:inset 0 0 0 2px rgba(255,214,10,.58)!important}
+.square.cpu-to .piece{box-shadow:0 0 0 2px rgba(255,214,10,.35)}
