@@ -86,7 +86,13 @@
     }
     if(p.type==="P"){
       const out=[],fr=p.r+p.dr,fc=p.c+p.dc;
-      if(inside(fr,fc)&&!at(fr,fc,arr))out.push({r:fr,c:fc,capture:false});
+      if(inside(fr,fc)&&!at(fr,fc,arr)){
+        out.push({r:fr,c:fc,capture:false});
+        if(!p.moved){
+          const fr2=p.r+(p.dr*2),fc2=p.c+(p.dc*2);
+          if(inside(fr2,fc2)&&!at(fr2,fc2,arr))out.push({r:fr2,c:fc2,capture:false});
+        }
+      }
       const perps=p.dr!==0?[[p.dr,1],[p.dr,-1]]:[[1,p.dc],[-1,p.dc]];
       for(const [dr,dc] of perps){const r=p.r+dr,c=p.c+dc,q=inside(r,c)?at(r,c,arr):null;if(q&&enemy(p.owner,q.owner))out.push({r,c,capture:true});}
       return out;
@@ -154,7 +160,10 @@
     }
     if(victim)victim.alive=false;
     p.r=m.r;p.c=m.c;p.moved=true;
-    if(p.type==="P"&&(p.r===0||p.r===ROWS-1||p.c===0||p.c===COLS-1))p.type="Q";
+    if(p.type==="P"&&(p.r===0||p.r===ROWS-1||p.c===0||p.c===COLS-1)){
+      p.type="Q";
+      message=p.owner+" pawn promoted to a queen.";
+    }
     selected=null;legalTargets=[];
     return true;
   }
@@ -163,6 +172,20 @@
     if(gameOver)return;
     const cpu=pieces.filter(p=>p.alive&&p.owner==="CPU");
     if(!cpu.length)return;
+
+    // Experimental "last stand" balance rule:
+    // at king + one piece, CPU acts once per full surviving-human round rather than after every human move.
+    if(cpu.length===2){
+      const aliveIndices=HUMAN_IDS.map((o,i)=>kingOf(o)?i:-1).filter(i=>i>=0);
+      const lastAlive=Math.max(...aliveIndices);
+      if(currentHuman!==lastAlive){
+        message="CPU LAST STAND — CPU holds. Next surviving player moves.";
+        advanceHuman();
+        render();
+        return;
+      }
+    }
+
     // Boss rule: while other CPU pieces remain, CPU need not resolve a pinned king.
     let candidates=[];
     for(const p of cpu){
@@ -239,7 +262,27 @@
     document.getElementById("checkLabel").textContent=kingOf(current)?(inCheck(current)?"CHECK":"Safe"):"Eliminated";
     document.getElementById("message").textContent=message;
 
-    const leg=document.getElementById("legend");leg.innerHTML=[...HUMAN_IDS,"CPU"].map(o=>'<span class="legend-chip"><i class="swatch" style="--c:'+COLORS[o]+'"></i>'+o+'</span>').join("");
+    const leg=document.getElementById("legend");
+    leg.innerHTML=[...HUMAN_IDS,"CPU"].map(o=>'<span class="legend-chip '+(o===current&&!gameOver?'active':'')+'" style="--c:'+COLORS[o]+'"><i class="swatch" style="--c:'+COLORS[o]+'"></i>'+o+'</span>').join("");
+
+    const banner=document.getElementById("turnBanner");
+    banner.style.setProperty("--turn-color",COLORS[current]);
+    document.getElementById("turnDot").style.background=COLORS[current];
+    document.getElementById("turnBannerText").textContent=gameOver?"GAME OVER":current+" TURN";
+  }
+
+  function setCellSize(px){
+    const wrap=document.getElementById("boardWrap");
+    wrap.style.setProperty("--cell",Math.max(20,Math.min(64,px))+"px");
+  }
+  function fitBoard(){
+    const wrap=document.getElementById("boardWrap");
+    const usable=Math.max(320,wrap.clientWidth-34);
+    setCellSize(Math.floor(usable/COLS));
+  }
+  function currentCellSize(){
+    const v=getComputedStyle(document.getElementById("boardWrap")).getPropertyValue("--cell");
+    return parseFloat(v)||42;
   }
 
   function labels(){
@@ -249,5 +292,10 @@
 
   document.getElementById("resetBtn").addEventListener("click",reset);
   document.getElementById("cpuBtn").addEventListener("click",cpuMove);
+  document.getElementById("zoomOutBtn").addEventListener("click",()=>setCellSize(currentCellSize()-4));
+  document.getElementById("zoomInBtn").addEventListener("click",()=>setCellSize(currentCellSize()+4));
+  document.getElementById("fitBtn").addEventListener("click",fitBoard);
+  window.addEventListener("resize",()=>{if(window.innerWidth<800)fitBoard();});
   labels();reset();
+  setTimeout(()=>{if(window.innerWidth<800)fitBoard();},0);
 })();
