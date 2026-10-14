@@ -230,3 +230,35 @@ h1{margin:4px 0 5px;font-size:clamp(28px,4vw,48px);line-height:1}
 .square.cpu-to .piece{
   box-shadow:none!important;
 }
+
+/* v10 compact CPU move marker: no board-spanning arrow */
+.cpu-move-arrow{display:none!important}
+.square.cpu-from{
+  box-shadow:inset 0 0 0 2px rgba(255,59,48,.28)!important;
+}
+.square.cpu-to{
+  box-shadow:inset 0 0 0 2px rgba(255,214,10,.45)!important;
+}
+.cpu-trace-dot{
+  position:absolute;
+  left:4px;
+  top:4px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:rgba(255,59,48,.55);
+  z-index:5;
+  pointer-events:none;
+}
+.cpu-trace-arrow{
+  position:absolute;
+  right:2px;
+  top:1px;
+  z-index:6;
+  pointer-events:none;
+  font-size:calc(var(--cell)*.24);
+  line-height:1;
+  font-weight:900;
+  color:rgba(255,214,10,.72);
+  text-shadow:0 1px 1px rgba(0,0,0,.55);
+}
