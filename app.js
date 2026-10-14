@@ -1,12 +1,12 @@
 (() => {
   "use strict";
-  const COLS=17, ROWS=22, FILES="ABCDEFGHIJKLMNOPQ";
+  const COLS=17, ROWS=16, FILES="ABCDEFGHIJKLMNOPQ";
   const HUMAN_IDS=["P1","P2","P3","P4","P5","P6"];
   const COLORS={P1:"#ef476f",P2:"#f78c3d",P3:"#ffd166",P4:"#06d6a0",P5:"#36a2eb",P6:"#9b5de5",CPU:"#8c96a8"};
   const GLYPH={K:"♚",Q:"♛",R:"♜",B:"♝",N:"♞",P:"♟"};
   const back=["R","N","B","Q","K","B","N","R"];
 
-  let pieces=[], selected=null, legalTargets=[], currentHuman=0, gameOver=false, message="";
+  let pieces=[], selected=null, legalTargets=[], currentHuman=0, gameOver=false, message="", turnTransferred=false;
 
   function piece(owner,type,r,c,dr=0,dc=0){return {id:owner+"-"+type+"-"+r+"-"+c+"-"+Math.random().toString(36).slice(2,7),owner,type,r,c,dr,dc,moved:false,alive:true};}
   function at(r,c,arr=pieces){return arr.find(p=>p.alive&&p.r===r&&p.c===c)||null;}
@@ -20,37 +20,36 @@
       back.forEach((t,i)=>pieces.push(piece(owner,t,0,start+i,1,0)));
       for(let i=0;i<8;i++)pieces.push(piece(owner,"P",1,start+i,1,0));
     }else if(edge==="bottom"){
-      back.forEach((t,i)=>pieces.push(piece(owner,t,21,start+i,-1,0)));
-      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",20,start+i,-1,0));
+      back.forEach((t,i)=>pieces.push(piece(owner,t,15,start+i,-1,0)));
+      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",14,start+i,-1,0));
     }else if(edge==="left"){
-      back.forEach((t,i)=>pieces.push(piece(owner,t,7+i,0,0,1)));
-      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",7+i,1,0,1));
+      back.forEach((t,i)=>pieces.push(piece(owner,t,4+i,0,0,1)));
+      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",4+i,1,0,1));
     }else if(edge==="right"){
-      back.forEach((t,i)=>pieces.push(piece(owner,t,7+i,16,0,-1)));
-      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",7+i,15,0,-1));
+      back.forEach((t,i)=>pieces.push(piece(owner,t,4+i,16,0,-1)));
+      for(let i=0;i<8;i++)pieces.push(piece(owner,"P",4+i,15,0,-1));
     }
   }
 
   function setupCPU(){
-    // Four outward pawn fronts. The four-square gaps are rows 2–5 / 16–19 and files 2–5 / 11–14.
-    for(let c=6;c<=10;c++) pieces.push(piece("CPU","P",6,c,-1,0));
-    for(let c=6;c<=10;c++) pieces.push(piece("CPU","P",15,c,1,0));
-    for(let r=7;r<=14;r++) pieces.push(piece("CPU","P",r,6,0,-1));
-    for(let r=7;r<=14;r++) pieces.push(piece("CPU","P",r,10,0,1));
+    // One empty square between every human pawn front and the nearest CPU pawn front.
+    for(let c=3;c<=13;c++) pieces.push(piece("CPU","P",3,c,-1,0));
+    for(let c=3;c<=13;c++) pieces.push(piece("CPU","P",12,c,1,0));
+    for(let r=4;r<=11;r++) pieces.push(piece("CPU","P",r,3,0,-1));
+    for(let r=4;r<=11;r++) pieces.push(piece("CPU","P",r,13,0,1));
 
-    // Inner fortress: one king total; other major/minor pieces can scale with the boss.
+    // Compact inner fortress; still one CPU king total.
     const core=[
-      ["R",7,7],["N",7,8],["B",7,9],
-      ["Q",9,7],["B",9,9],
-      ["N",11,7],["K",11,8],["N",11,9],
-      ["B",13,7],["Q",13,9],
-      ["R",14,7],["N",14,8],["B",14,9]
+      ["R",4,6],["N",4,7],["B",4,8],["Q",4,9],["R",4,10],
+      ["B",6,7],["N",6,9],
+      ["Q",8,6],["K",8,8],["B",8,10],
+      ["N",10,7],["B",10,9],["R",11,8]
     ];
     core.forEach(([t,r,c])=>pieces.push(piece("CPU",t,r,c)));
   }
 
   function reset(){
-    pieces=[];selected=null;legalTargets=[];currentHuman=0;gameOver=false;
+    pieces=[];selected=null;legalTargets=[];currentHuman=0;gameOver=false;turnTransferred=false;
     addArmy("P1","top",0);addArmy("P2","top",9);
     addArmy("P3","right",0);
     addArmy("P4","bottom",9);addArmy("P5","bottom",0);
@@ -217,12 +216,30 @@
     }
   }
 
+  function transferTurn(targetOwner){
+    if(gameOver||turnTransferred)return;
+    const current=HUMAN_IDS[currentHuman];
+    if(inCheck(current)){
+      message=current+" is in CHECK and must resolve it before the turn can be given away.";
+      render();
+      return;
+    }
+    const idx=HUMAN_IDS.indexOf(targetOwner);
+    if(idx<0||idx===currentHuman||!kingOf(targetOwner))return;
+    currentHuman=idx;
+    selected=null;
+    legalTargets=[];
+    turnTransferred=true;
+    message="TURN GIVEN TO "+targetOwner+" — choose the team's move.";
+    render();
+  }
+
   function clickSquare(r,c){
     if(gameOver)return;
     const owner=HUMAN_IDS[currentHuman],q=at(r,c);
     const target=legalTargets.find(m=>m.r===r&&m.c===c);
     if(selected&&target){
-      if(applyMove(selected,target)){finishChecks();render();if(!gameOver)setTimeout(cpuMove,350);}
+      if(applyMove(selected,target)){turnTransferred=false;finishChecks();render();if(!gameOver)setTimeout(cpuMove,350);}
       return;
     }
     if(q&&q.owner===owner){
@@ -241,7 +258,7 @@
       const sq=document.createElement("button");sq.className="square";
       sq.style.setProperty("--sq",(r+c)%2?"var(--dark)":"var(--light)");
       const p=at(r,c);
-      if(r>=6&&r<=15&&c>=6&&c<=10)sq.classList.add("cpu-zone");
+      if(r>=3&&r<=12&&c>=3&&c<=13)sq.classList.add("cpu-zone");
       if(selected?.r===r&&selected?.c===c)sq.classList.add("selected");
       const lm=legalTargets.find(m=>m.r===r&&m.c===c);if(lm)sq.classList.add(lm.capture?"capture":"legal");
       if(p?.type==="K"&&inCheck(p.owner))sq.classList.add("in-check");
@@ -269,6 +286,16 @@
     banner.style.setProperty("--turn-color",COLORS[current]);
     document.getElementById("turnDot").style.background=COLORS[current];
     document.getElementById("turnBannerText").textContent=gameOver?"GAME OVER":current+" TURN";
+
+    const pass=document.getElementById("passTargets");
+    if(pass){
+      const blocked=inCheck(current)||turnTransferred||gameOver;
+      pass.innerHTML=HUMAN_IDS.filter(o=>o!==current&&kingOf(o)).map(o=>{
+        const checked=inCheck(o);
+        return '<button class="pass-target '+(checked?'check':'')+'" style="--c:'+COLORS[o]+'" data-pass="'+o+'" '+(blocked?'disabled':'')+'>'+o+(checked?' • CHECK':'')+'</button>';
+      }).join("");
+      pass.querySelectorAll("[data-pass]").forEach(btn=>btn.addEventListener("click",()=>transferTurn(btn.dataset.pass)));
+    }
   }
 
   function setCellSize(px){
