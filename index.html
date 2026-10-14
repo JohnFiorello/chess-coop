@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111827">
   <meta name="description" content="Six-player cooperative chess rules prototype">
   <title>Cooperative Chess — 6P Rules Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <main class="app">
@@ -14,7 +14,7 @@
       <div>
         <div class="eyebrow">RULES PROTOTYPE • SIX-PLAYER STRESS TEST</div>
         <h1>COOPERATIVE CHESS</h1>
-        <p>Six human armies. One central CPU fortress. Four-square engagement distance on every side.</p>
+        <p>Six human armies. One central CPU fortress. One-square engagement distance on every side.</p>
       </div>
       <div class="toolbar">
         <button id="resetBtn">Reset board</button>
@@ -39,6 +39,14 @@
       <span class="turn-hint">Move one piece, then CPU responds.</span>
     </section>
 
+    <section class="assist-panel">
+      <div>
+        <strong>Co-op assist:</strong>
+        <span>Give this human turn to another surviving teammate before moving.</span>
+      </div>
+      <div class="pass-targets" id="passTargets"></div>
+    </section>
+
     <section class="board-tools">
       <button id="zoomOutBtn" aria-label="Zoom board out">−</button>
       <button id="fitBtn">Fit board</button>
@@ -56,9 +64,9 @@
 
     <section class="notes">
       <h2>Prototype assumptions</h2>
-      <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. Pawns may move two squares on their first move and promote to queens at the far edge. Experimental endgame rule: when the CPU is down to its king plus one piece, it moves only once per full surviving-human round to prevent a king-and-queen chase from becoming effectively endless.</p>
+      <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. Pawns may move two squares on their first move and promote to queens at the far edge. A player may give their turn to another surviving teammate before moving, unless their own king is in check; this lets the team react cooperatively to threats. Experimental endgame rule: when the CPU is down to its king plus one piece, it moves only once per full surviving-human round to prevent a king-and-queen chase from becoming effectively endless.</p>
     </section>
   </main>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
