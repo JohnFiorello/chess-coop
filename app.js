@@ -278,16 +278,13 @@
       if(selected?.r===r&&selected?.c===c)sq.classList.add("selected");
       if(lastCpuMove?.from.r===r&&lastCpuMove?.from.c===c){
         sq.classList.add("cpu-from");
-        const dot=document.createElement("span");
-        dot.className="cpu-trace-dot";
-        sq.appendChild(dot);
-      }
-      if(lastCpuMove?.to.r===r&&lastCpuMove?.to.c===c){
-        sq.classList.add("cpu-to");
         const mark=document.createElement("span");
         mark.className="cpu-trace-arrow";
         mark.textContent=cpuMoveArrowChar();
         sq.appendChild(mark);
+      }
+      if(lastCpuMove?.to.r===r&&lastCpuMove?.to.c===c){
+        sq.classList.add("cpu-to");
       }
       const lm=legalTargets.find(m=>m.r===r&&m.c===c);if(lm)sq.classList.add(lm.capture?"capture":"legal");
       if(p?.type==="K"&&inCheck(p.owner))sq.classList.add("in-check");
