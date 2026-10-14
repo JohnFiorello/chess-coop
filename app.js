@@ -252,6 +252,21 @@
     render();
   }
 
+  function cpuMoveArrowChar(){
+    if(!lastCpuMove)return "";
+    const dr=Math.sign(lastCpuMove.to.r-lastCpuMove.from.r);
+    const dc=Math.sign(lastCpuMove.to.c-lastCpuMove.from.c);
+    if(dr<0&&dc<0)return "↖";
+    if(dr<0&&dc>0)return "↗";
+    if(dr>0&&dc<0)return "↙";
+    if(dr>0&&dc>0)return "↘";
+    if(dr<0)return "↑";
+    if(dr>0)return "↓";
+    if(dc<0)return "←";
+    if(dc>0)return "→";
+    return "•";
+  }
+
   function render(){
     const board=document.getElementById("board");board.innerHTML="";
     const current=HUMAN_IDS[currentHuman];
@@ -261,8 +276,19 @@
       const p=at(r,c);
       if(r>=3&&r<=12&&c>=3&&c<=6)sq.classList.add("cpu-zone");
       if(selected?.r===r&&selected?.c===c)sq.classList.add("selected");
-      if(lastCpuMove?.from.r===r&&lastCpuMove?.from.c===c)sq.classList.add("cpu-from");
-      if(lastCpuMove?.to.r===r&&lastCpuMove?.to.c===c)sq.classList.add("cpu-to");
+      if(lastCpuMove?.from.r===r&&lastCpuMove?.from.c===c){
+        sq.classList.add("cpu-from");
+        const dot=document.createElement("span");
+        dot.className="cpu-trace-dot";
+        sq.appendChild(dot);
+      }
+      if(lastCpuMove?.to.r===r&&lastCpuMove?.to.c===c){
+        sq.classList.add("cpu-to");
+        const mark=document.createElement("span");
+        mark.className="cpu-trace-arrow";
+        mark.textContent=cpuMoveArrowChar();
+        sq.appendChild(mark);
+      }
       const lm=legalTargets.find(m=>m.r===r&&m.c===c);if(lm)sq.classList.add(lm.capture?"capture":"legal");
       if(p?.type==="K"&&inCheck(p.owner))sq.classList.add("in-check");
       if(p){
@@ -298,7 +324,7 @@
         line.setAttribute("y1",lastCpuMove.from.r+0.72);
         line.setAttribute("x2",lastCpuMove.to.c+0.28);
         line.setAttribute("y2",lastCpuMove.to.r+0.28);
-        line.style.opacity="0.10";
+        line.style.opacity="0";
       }else{
         line.style.opacity="0";
       }
