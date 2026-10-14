@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111827">
-  <meta name="description" content="Six-player cooperative chess rules prototype">
-  <title>Cooperative Chess — 6P Rules Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=7">
+  <meta name="description" content="Four-player cooperative chess rules prototype">
+  <title>Cooperative Chess — 4P Rules Prototype</title>
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <main class="app">
@@ -59,6 +59,10 @@
       <div class="board-shell">
         <div class="file-labels" id="fileLabels"></div>
         <div id="board" class="board" aria-label="10 by 16 cooperative chess board"></div>
+        <svg id="cpuMoveArrow" class="cpu-move-arrow" viewBox="0 0 10 16" preserveAspectRatio="none" aria-hidden="true">
+          <defs><marker id="cpuArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth=".75" markerHeight=".75" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs>
+          <line id="cpuArrowLine" x1="0" y1="0" x2="0" y2="0" marker-end="url(#cpuArrowHead)"></line>
+        </svg>
       </div>
     </section>
 
@@ -67,6 +71,6 @@
       <p>The CPU fortress is deliberately data-driven so we can adjust its exact formation after playtesting without rewriting the movement engine. Castling and en passant are off. Human allies block one another but cannot capture one another. Pawns may move two squares on their first move and promote to queens at the far edge. A player may give their turn to another surviving teammate before moving, unless their own king is in check; this lets the team react cooperatively to threats. Experimental endgame rule: when the CPU is down to its king plus one piece, it moves only once per full surviving-human round to prevent a king-and-queen chase from becoming effectively endless.</p>
     </section>
   </main>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
