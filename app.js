@@ -294,11 +294,11 @@
     const line=document.getElementById("cpuArrowLine");
     if(arrow&&line){
       if(lastCpuMove){
-        line.setAttribute("x1",lastCpuMove.from.c+0.5);
-        line.setAttribute("y1",lastCpuMove.from.r+0.5);
-        line.setAttribute("x2",lastCpuMove.to.c+0.5);
-        line.setAttribute("y2",lastCpuMove.to.r+0.5);
-        line.style.opacity="1";
+        line.setAttribute("x1",lastCpuMove.from.c+0.72);
+        line.setAttribute("y1",lastCpuMove.from.r+0.72);
+        line.setAttribute("x2",lastCpuMove.to.c+0.28);
+        line.setAttribute("y2",lastCpuMove.to.r+0.28);
+        line.style.opacity="0.10";
       }else{
         line.style.opacity="0";
       }
