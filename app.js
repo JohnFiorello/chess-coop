@@ -18,7 +18,7 @@
   };
 
   let pieces=[], selected=null, legalTargets=[], currentHuman=0, gameOver=false, message="";
-  let turnTransferred=false, lastCpuMove=null;
+  let turnTransferred=false, lastCpuMove=null, cpuThinking=false;
   let mode="local", peer=null, hostConn=null, isHost=false, roomCode="";
   let connections=new Map(), participants=[], seatOwners={}, myParticipantId="local", gameStarted=false;
 
@@ -65,7 +65,7 @@
   }
 
   function resetState(){
-    pieces=[];selected=null;legalTargets=[];currentHuman=0;gameOver=false;turnTransferred=false;lastCpuMove=null;
+    pieces=[];selected=null;legalTargets=[];currentHuman=0;gameOver=false;turnTransferred=false;lastCpuMove=null;cpuThinking=false;
     addArmy("P1","top",1);
     addArmy("P2","right",0);
     addArmy("P3","bottom",1);
@@ -189,6 +189,7 @@
 
   function cpuMove(){
     if(!authority()||gameOver)return;
+    cpuThinking=false;
     const cpu=pieces.filter(p=>p.alive&&p.owner==="CPU");
     if(!cpu.length)return;
 
@@ -255,7 +256,9 @@
     const legal=legalMoves(p).find(m=>m.r===target.r&&m.c===target.c);
     if(!legal)return;
     if(applyMove(p,legal)){
-      lastCpuMove=null;turnTransferred=false;finishChecks();syncState();
+      lastCpuMove=null;turnTransferred=false;finishChecks();
+      if(!gameOver){cpuThinking=true;message="CPU is moving…";}
+      syncState();
       if(!gameOver)setTimeout(cpuMove,500);
     }
   }
@@ -265,7 +268,7 @@
     hostConn?.send({type:"transferRequest",targetOwner});
   }
   function performTransfer(targetOwner,senderId){
-    if(!authority()||gameOver||turnTransferred)return;
+    if(!authority()||gameOver||turnTransferred||cpuThinking)return;
     const current=currentTeam();
     if(mode!=="local"&&seatOwners[current]!==senderId)return;
     if(inCheck(current)){message=current+" is in CHECK and must resolve it.";syncState();return;}
@@ -277,7 +280,7 @@
   }
 
   function clickSquare(r,c){
-    if(!gameStarted||gameOver)return;
+    if(!gameStarted||gameOver||cpuThinking)return;
     const owner=currentTeam();
     if(!controls(owner)){message="Waiting for "+participantName(seatOwners[owner])+" ("+owner+") to move.";render();return;}
     const q=at(r,c);
@@ -293,11 +296,11 @@
   }
 
   function statePayload(){
-    return {pieces,currentHuman,gameOver,message,turnTransferred,lastCpuMove,seatOwners,participants};
+    return {pieces,currentHuman,gameOver,message,turnTransferred,lastCpuMove,cpuThinking,seatOwners,participants};
   }
   function loadState(s){
     pieces=s.pieces||[];currentHuman=s.currentHuman||0;gameOver=!!s.gameOver;message=s.message||"";
-    turnTransferred=!!s.turnTransferred;lastCpuMove=s.lastCpuMove||null;seatOwners=s.seatOwners||seatOwners;participants=s.participants||participants;
+    turnTransferred=!!s.turnTransferred;lastCpuMove=s.lastCpuMove||null;cpuThinking=!!s.cpuThinking;seatOwners=s.seatOwners||seatOwners;participants=s.participants||participants;
     selected=null;legalTargets=[];gameStarted=true;hideLobby();render();
   }
   function syncState(){
@@ -476,11 +479,11 @@
     banner.style.setProperty("--turn-color",COLORS[current]);
     $("turnDot").style.background=COLORS[current];
     $("turnBannerText").textContent=gameOver?"GAME OVER":current+" TURN";
-    $("turnHint").textContent=gameOver?"":controls(current)?"YOUR MOVE":"Waiting for "+participantName(seatOwners[current]);
+    $("turnHint").textContent=gameOver?"":cpuThinking?"CPU MOVING…":controls(current)?"YOUR MOVE":"Waiting for "+participantName(seatOwners[current]);
 
     const pass=$("passTargets");
     if(pass){
-      const blocked=inCheck(current)||turnTransferred||gameOver||!controls(current);
+      const blocked=inCheck(current)||turnTransferred||gameOver||cpuThinking||!controls(current);
       pass.innerHTML=HUMAN_IDS.filter(o=>o!==current&&kingOf(o)).map(o=>{
         const checked=inCheck(o);
         return '<button class="pass-target '+(checked?'check':'')+'" style="--c:'+COLORS[o]+'" data-pass="'+o+'" '+(blocked?'disabled':'')+'>'+o+(checked?' • CHECK':'')+'</button>';
